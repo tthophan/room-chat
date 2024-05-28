@@ -3,12 +3,12 @@ import { validate } from '@config/validation';
 import { CoreExceptionFilter } from '@core/filters';
 import { CoreResponseInterceptor, LoggingInterceptor } from '@core/interceptors';
 import { RequestContextMiddleware } from '@core/middlewares';
+import { AuthModule } from '@modules/auth';
 import { HealthModule } from '@modules/health';
+import { PrismaModule } from '@modules/prisma';
 import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -20,11 +20,12 @@ import { AppService } from './app.service';
         abortEarly: true,
       },
     }),
-    HealthModule
+    HealthModule,
+    PrismaModule,
+    AuthModule
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: CoreResponseInterceptor,

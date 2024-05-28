@@ -78,7 +78,7 @@ export function roundToTwo(num: number) {
 export function generateCID(cid?: string) {
   if (cid) return cid;
   const now = dayjs();
-  return `vh-${now.format('YYYYMMDDHH-mmssSSS')}-${Math.floor(
+  return `CID-${now.format('YYYYMMDDHH-mmssSSS')}-${Math.floor(
     Math.random() * 1000,
   )
     .toString()

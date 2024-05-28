@@ -10,7 +10,7 @@ export interface Configuration {
   jwt: {
     secret: string;
     issuer: string;
-    expireIn: number;
+    expiresIn: number;
   };
 }
 

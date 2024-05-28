@@ -1,0 +1,4 @@
+# files that will always have LF line endings on checkout. 
+# * -lf
+* text eol=lf
+Ø

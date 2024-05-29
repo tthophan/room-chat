@@ -2,13 +2,21 @@ import configuration from '@config/configuration';
 import { validate } from '@config/validation';
 import { CoreExceptionFilter } from '@core/filters';
 import { AuthGuard } from '@core/guards';
-import { CoreResponseInterceptor, LoggingInterceptor } from '@core/interceptors';
+import {
+  CoreResponseInterceptor,
+  LoggingInterceptor,
+} from '@core/interceptors';
 import { RequestContextMiddleware } from '@core/middlewares';
 import { AuthModule } from '@modules/auth';
 import { HealthModule } from '@modules/health';
 import { PrismaModule } from '@modules/prisma';
-import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChatModule } from './modules/chat';
@@ -31,7 +39,7 @@ import { UserModule } from './modules/user';
     HealthModule,
     PrismaModule,
     AuthModule,
-    ChatModule
+    ChatModule,
   ],
   controllers: [],
   providers: [
@@ -62,12 +70,11 @@ import { UserModule } from './modules/user';
     },
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
-    }
+      useClass: AuthGuard,
+    },
   ],
 })
-export class AppModule
-  implements NestModule {
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RequestContextMiddleware).forRoutes('*');
   }

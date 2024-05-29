@@ -13,11 +13,11 @@ export interface Configuration {
     expiresIn: number;
   };
   redis: {
-    host: string
-    port: number
-    db: number
-  },
-  redisUrl: string
+    host: string;
+    port: number;
+    db: number;
+  };
+  redisUrl: string;
 }
 
 export type JWTConfig = Configuration['jwt'];

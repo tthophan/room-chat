@@ -1,3 +1,3 @@
 export class CreateRoomPayload {
-    name: string
+  name: string;
 }

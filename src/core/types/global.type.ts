@@ -1,4 +1,4 @@
-import { RequestContext } from "../models";
+import { RequestContext } from '../models';
 
 declare global {
   // eslint-disable-next-line  @typescript-eslint/no-namespace

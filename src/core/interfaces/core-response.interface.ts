@@ -1,4 +1,4 @@
-import { ERR } from "../enums";
+import { ERR } from '../enums';
 
 export interface CoreResponse<T = any> {
   cid: string;

@@ -1,0 +1,85 @@
+services:
+  server-01:
+    build:
+      context: .
+    container_name: chat_server-01
+    restart: on-failure
+    environment:
+      NODE_ENV: production
+      PORT: 80
+      DATABASE_URL: mysql://root:rootpw@db/chat_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      JWT_SECRET: secret
+      JWT_EXPIRE_IN: 3600
+      JWT_ISSUER: CHAT
+      REDIS_URL: redis://redis:6379
+    ports:
+      - 8081:80
+
+  server-02:
+    build:
+      context: .
+    container_name: chat_server-02
+    restart: on-failure
+    environment:
+      NODE_ENV: production
+      PORT: 80
+      DATABASE_URL: mysql://root:rootpw@db/chat_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      JWT_SECRET: secret
+      JWT_EXPIRE_IN: 3600
+      JWT_ISSUER: CHAT
+      REDIS_URL: redis://redis:6379
+    ports:
+      - 8082:80
+
+  server-03:
+    build:
+      context: .
+    container_name: chat_server-03
+    restart: on-failure
+    environment:
+      NODE_ENV: production
+      PORT: 80
+      DATABASE_URL: mysql://root:rootpw@db/chat_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      JWT_SECRET: secret
+      JWT_EXPIRE_IN: 3600
+      JWT_ISSUER: CHAT
+      REDIS_URL: redis://redis:6379
+    ports:
+      - 8083:80
+
+  db:
+    image: mysql:latest
+    container_name: chat_database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: chat_db
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - 3361:3306
+
+  redis:
+    image: redis:latest
+    container_name: chat_redis
+    restart: always
+    ports:
+      - 63799:6379
+    volumes:
+      - redis-data:/root/redis
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+
+volumes:
+  db-data:
+  redis-data:

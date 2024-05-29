@@ -2,7 +2,7 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
-  HttpException
+  HttpException,
 } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -15,18 +15,16 @@ import { BusinessException } from '../exceptions';
 
 type ExceptionResponse =
   | {
-    data?: unknown;
-    statusCode: number;
-    message: string | string[];
-    error: string;
-  }
+      data?: unknown;
+      statusCode: number;
+      message: string | string[];
+      error: string;
+    }
   | string;
 @Catch()
 @Injectable()
 export class CoreExceptionFilter implements ExceptionFilter {
-  constructor(
-    private readonly configService: ConfigService,
-  ) { }
+  constructor(private readonly configService: ConfigService) {}
 
   /**
    * Handles exceptions thrown in the NestJS application and returns an appropriate error response.

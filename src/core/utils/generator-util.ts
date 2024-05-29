@@ -1,34 +1,32 @@
 import { createCipheriv, createDecipheriv, createHmac } from 'crypto';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import * as crypto from 'node:crypto';
-const alphaNumeric = '23456789abcdefghjkmnpqrstuvwxyz'.split('');
-const alphaNumericUppercase = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'.split('');
-const numericCharacters = '123456789'.split('');
 
 export class GeneratorService {
-
   /**
    * Decode JWT token
    * @param token token string
    * @param keySecret secret key
    * @returns decoded data
    */
-  static verifyJwtToken = async <T extends JwtPayload>(token: string, keySecret: string): Promise<{ data: T, verified: boolean }> => {
+  static verifyJwtToken = async <T extends JwtPayload>(
+    token: string,
+    keySecret: string,
+  ): Promise<{ data: T; verified: boolean }> => {
     return await new Promise((resolve) => {
       try {
         const data = jwt.verify(token, keySecret) as T;
         resolve({
           data,
-          verified: true
-        })
+          verified: true,
+        });
       } catch {
         resolve({
           data: null,
-          verified: false
-        })
+          verified: false,
+        });
       }
-    })
-  }
+    });
+  };
 
   /**
    * Create JWT token
@@ -80,12 +78,12 @@ export class GeneratorService {
   }
 
   /**
-   * 
+   *
    * Decode encrypted data that was encoded using the `encode` function.
    * @param encryptedData The encrypted data to be decoded.
    * @param key The key used to encode the data.
-   * @param algorithm 
-   * @returns 
+   * @param algorithm
+   * @returns
    */
   static decode(
     encryptedData: string,

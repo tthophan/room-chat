@@ -14,5 +14,5 @@ export default (): Configuration => ({
     port: Number(process.env.REDIS_PORT),
     db: Number(process.env.REDIS_DB),
   },
-  redisUrl: process.env.REDIS_URL
+  redisUrl: process.env.REDIS_URL,
 });

@@ -13,9 +13,9 @@ import { formatMilliseconds } from '../utils';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger: Logger
+  private readonly logger: Logger;
   constructor() {
-    this.logger = new Logger()
+    this.logger = new Logger();
   }
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request>();

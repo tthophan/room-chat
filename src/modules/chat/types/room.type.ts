@@ -1,4 +1,4 @@
 export type JoinRoomParam = {
-    id: number
-    userId: number;
-}
+  id: number;
+  userId: number;
+};

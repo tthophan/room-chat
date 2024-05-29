@@ -25,7 +25,8 @@ export class AuthService extends BaseService {
         })
         if (checkUser) throw new BusinessException({
             errorCode: ERR.BAD_USER_INPUT,
-            status: HttpStatus.CONFLICT
+            status: HttpStatus.CONFLICT,
+            err: 'Username already exists'
         })
         const passwordSecure = GeneratorService.uuid().replace(/-/g, '')
         const user = await this.prismaService.user.create({
@@ -43,6 +44,7 @@ export class AuthService extends BaseService {
             lastName: user.lastName
         })
     }
+
     async SignIn(payload: SignInPayload) {
         const { username, password } = payload;
         const user = await this.prismaService.user.findUnique({

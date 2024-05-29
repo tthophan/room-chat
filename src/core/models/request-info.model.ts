@@ -7,6 +7,7 @@ export class RequestContext {
   requestTimestamp: number;
   accessToken: string;
   userInfo: UserInfo;
+  userId?: number;
   constructor(data: Partial<RequestContext>) {
     Object.assign(this, data);
   }

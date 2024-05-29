@@ -35,6 +35,21 @@ class EnvironmentVariables {
 
   @IsNumber()
   JWT_EXPIRE_IN: number;
+
+  @IsString()
+  REDIS_HOST: string
+
+  @IsString()
+  REDIS_URL: string
+
+  @IsNumber()
+  @Min(1)
+  @Max(65535)
+  REDIS_PORT: number
+
+  @IsNumber()
+  REDIS_DB: number
+
 }
 
 export function validate(config: Record<string, unknown>) {

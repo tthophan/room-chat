@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpStatus,
   Injectable,
   Scope
 } from '@nestjs/common';
@@ -8,6 +9,8 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { SessionService } from '~/modules/auth';
 import { AUTHORIZE } from '../constants';
+import { ERR } from '../enums';
+import { BusinessException } from '../exceptions';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthGuard implements CanActivate {
@@ -23,8 +26,16 @@ export class AuthGuard implements CanActivate {
       this.reflector.get(AUTHORIZE, context.getHandler()) ??
       this.reflector.get(AUTHORIZE, context.getClass());
     if (!localAuthData) return true;
-    
+
     const result = await this.sessionService.validateSession(request.context?.accessToken);
-    return result && result.verified
+    if (result && result.verified) {
+      request.context.userId = result.data.userId
+      return true
+    }
+    throw new BusinessException({
+      errorCode: ERR.TOKEN_EXPIRES,
+      err: 'Unauthorized',
+      status: HttpStatus.UNAUTHORIZED
+    })
   }
 }

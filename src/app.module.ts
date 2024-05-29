@@ -1,14 +1,19 @@
 import configuration from '@config/configuration';
 import { validate } from '@config/validation';
 import { CoreExceptionFilter } from '@core/filters';
+import { AuthGuard } from '@core/guards';
 import { CoreResponseInterceptor, LoggingInterceptor } from '@core/interceptors';
 import { RequestContextMiddleware } from '@core/middlewares';
 import { AuthModule } from '@modules/auth';
 import { HealthModule } from '@modules/health';
 import { PrismaModule } from '@modules/prisma';
 import { MiddlewareConsumer, Module, NestModule, ValidationPipe } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ChatModule } from './modules/chat';
+import { PubsubModule } from './modules/pubsub';
+import { UserModule } from './modules/user';
 
 @Module({
   imports: [
@@ -20,9 +25,13 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
         abortEarly: true,
       },
     }),
+    EventEmitterModule.forRoot(),
+    UserModule,
+    PubsubModule,
     HealthModule,
     PrismaModule,
-    AuthModule
+    AuthModule,
+    ChatModule
   ],
   controllers: [],
   providers: [
@@ -50,6 +59,10 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
           },
           stopAtFirstError: true,
         }),
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
     }
   ],
 })

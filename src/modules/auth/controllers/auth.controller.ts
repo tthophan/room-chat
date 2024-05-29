@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { BaseController } from "~/core/bases";
 import { SignInPayload, SignUpPayload } from "../models";
 import { AuthService } from "../services";
@@ -15,6 +15,7 @@ export class AuthController extends BaseController {
     }
 
     @Post('signup')
+    @HttpCode(HttpStatus.OK)
     async signup(
         @Body() payload: SignUpPayload
     ) {
@@ -22,6 +23,7 @@ export class AuthController extends BaseController {
     }
 
     @Post('signin')
+    @HttpCode(HttpStatus.OK)
     async signin(
         @Body() payload: SignInPayload
     ) {

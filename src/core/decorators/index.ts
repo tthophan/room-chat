@@ -1,1 +1,2 @@
-export * from './ignore-core-response.guard';
+export * from './authorize.decorator';
+export * from './ignore-core-response.decorator';

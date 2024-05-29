@@ -8,3 +8,9 @@ declare global {
     }
   }
 }
+
+declare module 'http' {
+  export interface IncomingMessage {
+    context: RequestContext;
+  }
+}

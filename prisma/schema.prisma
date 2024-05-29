@@ -8,13 +8,64 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement()) @map("id") @db.Int()
-  username       String   @unique @map("username") @db.VarChar(161)
-  password       String   @map("password") @db.VarChar(161)
-  passwordSecure String   @map("passwordSecure") @db.VarChar(36)
-  firstName      String?  @map("first_name") @db.VarChar(161)
-  lastName       String?  @map("last_name") @db.VarChar(161)
-  createdAt      DateTime @default(now()) @map("created_at")
+  id             Int        @id @default(autoincrement()) @map("id") @db.Int()
+  username       String     @unique @map("username") @db.VarChar(161)
+  password       String     @map("password") @db.VarChar(161)
+  passwordSecure String     @map("passwordSecure") @db.VarChar(36)
+  firstName      String?    @map("first_name") @db.VarChar(161)
+  lastName       String?    @map("last_name") @db.VarChar(161)
+  createdAt      DateTime   @default(now()) @map("created_at")
+  roomUsers      RoomUser[]
+  messages       Message[]
 
   @@map("user")
+}
+
+model Room {
+  id         Int        @id @default(autoincrement()) @map("id") @db.Int()
+  code       String     @map("code") @db.VarChar(161)
+  name       String     @map("name") @db.VarChar(255)
+  totalUser  Int        @map("total_user") @db.Int
+  createdBy  Int        @map("created_by")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  modifiedAt DateTime   @default(now()) @updatedAt @map("modified_at")
+  modifiedBy Int?       @map("modified_by")
+  messages   Message[]
+  roomUsers  RoomUser[]
+
+  @@map("room")
+}
+
+model RoomUser {
+  id         Int      @id @default(autoincrement()) @map("id") @db.UnsignedMediumInt()
+  userId     Int      @map("user_id") @db.Int()
+  roomId     Int      @map("room_id") @db.Int()
+  clientId   String?  @map("client_id") @db.VarChar(36)
+  createdBy  Int      @map("created_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
+  modifiedBy Int?     @map("modified_by")
+  room       Room?    @relation(fields: [roomId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([roomId, userId])
+  @@map("room_user")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement()) @map("id") @db.UnsignedMediumInt()
+  senderId   Int      @map("sender_id") @db.Int()
+  roomId     Int      @map("channel_id") @db.Int()
+  message    String   @map("message") @db.LongText()
+  createdBy  Int      @map("created_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
+  modifiedBy Int?     @map("modified_by")
+  room       Room?    @relation(fields: [roomId], references: [id])
+  sender     User?    @relation(fields: [senderId], references: [id])
+
+  @@index([roomId])
+  @@index([senderId, roomId, id])
+  @@index([senderId])
+  @@map("message")
 }

@@ -9,4 +9,10 @@ export default (): Configuration => ({
     expiresIn: Number(process.env.JWT_EXPIRE_IN),
     issuer: process.env.JWT_ISSUER,
   },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+    db: Number(process.env.REDIS_DB),
+  },
+  redisUrl: process.env.REDIS_URL
 });

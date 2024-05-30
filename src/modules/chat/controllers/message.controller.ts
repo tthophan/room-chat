@@ -24,11 +24,11 @@ import { MessageService } from '../services';
   version: '1.0',
 })
 @Authorize()
-export class ConversationController extends BaseController {
+export class MessageController extends BaseController {
   constructor(
     @Inject(REQUEST)
     private readonly request: Request,
-    private readonly conversationService: MessageService,
+    private readonly messageService: MessageService,
     private readonly eventEmitter: EventEmitter2,
   ) {
     super();
@@ -38,7 +38,7 @@ export class ConversationController extends BaseController {
     @Param('roomId', ParseIntPipe) roomId: number,
     @Query() query: FetchMessageQuery,
   ) {
-    return await this.conversationService.fetch({
+    return await this.messageService.fetch({
       cursor: query.cursor,
       limit: query.limit,
       roomId: roomId,
@@ -50,7 +50,7 @@ export class ConversationController extends BaseController {
     @Param('roomId', ParseIntPipe) roomId: number,
     @Body() payload: CreateMessagePayload,
   ) {
-    return await this.conversationService.create({
+    return await this.messageService.create({
       message: payload.message,
       roomId,
       senderId: this.request.context.userId!,
@@ -61,7 +61,7 @@ export class ConversationController extends BaseController {
     @Param('roomId', ParseIntPipe) roomId: number,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return await this.conversationService.delete({
+    return await this.messageService.delete({
       roomId,
       id,
       senderId: this.request.context.userId!,

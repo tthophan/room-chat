@@ -42,7 +42,8 @@ export class MessageService extends BaseService {
         sender: true,
       },
     });
-    return messages.map((message) => {
+
+    return messages?.map((message) => {
       return {
         message: message.message,
         sender: (() => {

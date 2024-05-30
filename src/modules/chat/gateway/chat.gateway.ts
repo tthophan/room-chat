@@ -141,7 +141,7 @@ export class ChatGateway
   }
 
   @SubscribeMessage(CHANNEL.SIGN_UP)
-  async identity(@MessageBody() data: string) {
+  async signUp(@MessageBody() data: string) {
     if (!data) return `Message Body is empty`;
     let input;
     try {

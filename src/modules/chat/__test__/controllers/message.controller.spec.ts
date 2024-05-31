@@ -66,7 +66,7 @@ describe('MessageController', () => {
       const payload = { message: 'hello' };
       jest
         .spyOn(messageService, 'create')
-        .mockReturnValue(new Promise((resolve) => resolve()));
+        .mockReturnValue(new Promise((resolve) => resolve({} as any)));
       await messageController.chat(roomId, payload);
       expect(messageService.create).toHaveBeenCalledTimes(1);
       expect(messageService.create).toHaveBeenCalledWith({

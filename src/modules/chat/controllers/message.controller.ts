@@ -50,7 +50,7 @@ export class MessageController extends BaseController {
     @Param('roomId', ParseIntPipe) roomId: number,
     @Body() payload: CreateMessagePayload,
   ) {
-    return await this.messageService.create({
+    await this.messageService.create({
       message: payload.message,
       roomId,
       senderId: this.request.context.userId!,
@@ -74,6 +74,5 @@ export class MessageController extends BaseController {
         return { data };
       }),
     );
-    // return interval(1000).pipe(map((_) => ({ data: { hello: 'world', roomId: roomId } })));
   }
 }

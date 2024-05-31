@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-semibold mb-4">Sign In</h1>
+        <form id="signInForm" class="mb-6">
+            <div class="mb-4">
+                <label for="signInUsername" class="block text-gray-700">Username</label>
+                <input type="text" id="signInUsername" name="signInUsername"
+                    class="border border-gray-300 px-4 py-2 rounded-lg w-full">
+            </div>
+            <div class="mb-4">
+                <label for="signInPassword" class="block text-gray-700">Password</label>
+                <input type="password" id="signInPassword" name="signInPassword"
+                    class="border border-gray-300 px-4 py-2 rounded-lg w-full">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Sign In</button>
+            <button type="button" id="signup" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Sign
+                Up</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const signInForm = document.getElementById('signInForm');
+
+            signInForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const signInUsername = document.getElementById('signInUsername').value.trim();
+                const signInPassword = document.getElementById('signInPassword').value.trim();
+                fetch('/v1.0/auth/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: signInUsername,
+                        password: signInPassword
+                    })
+                }).then(async (response) => {
+                    const result = await response.json();
+                    if (response.status === 200) {
+                        const { data } = result
+                        sessionStorage.setItem("authorization", data.token)
+                        sessionStorage.setItem("userId", data.userId)
+                        window.location.href = '/';
+                    } else {
+                        const { err } = result
+                        Toastify({
+                            text: err,
+                            className: "error",
+                        }).showToast();
+                    }
+                })
+            });
+
+            const signUpButton = document.getElementById('signup')
+            signUpButton.addEventListener('click', function () {
+                window.location.href = '/signup'
+            })
+        });
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+
+</html>

@@ -9,6 +9,9 @@ export class RoomService extends BaseService {
     super();
   }
 
+  async findAll() {
+    return await this.prismaService.room.findMany();
+  }
   async join(payload: JoinRoomParam) {
     const { id, userId } = payload;
     await this.prismaService.roomUser.upsert({

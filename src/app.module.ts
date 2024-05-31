@@ -22,6 +22,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChatModule } from './modules/chat';
 import { PubsubModule } from './modules/pubsub';
 import { UserModule } from './modules/user';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -32,6 +34,18 @@ import { UserModule } from './modules/user';
       validationOptions: {
         abortEarly: true,
       },
+    }),
+    ServeStaticModule.forRoot({
+      serveRoot: '/signin',
+      rootPath: join(__dirname, '..', 'public/auth/signin'),
+    }),
+    ServeStaticModule.forRoot({
+      serveRoot: '/signup',
+      rootPath: join(__dirname, '..', 'public/auth/signup'),
+    }),
+    ServeStaticModule.forRoot({
+      serveRoot: '',
+      rootPath: join(__dirname, '..', 'public/chat'),
     }),
     EventEmitterModule.forRoot(),
     UserModule,

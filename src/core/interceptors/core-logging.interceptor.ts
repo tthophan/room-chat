@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { formatMilliseconds } from '../utils';
+import { BusinessException } from '../exceptions';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -35,22 +36,25 @@ export class LoggingInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() =>
         this.logger.debug(
-          `Response [${requestContext.cid}] - [${response.statusCode}]: ${formatMilliseconds(new Date().getTime() - requestContext.requestTimestamp)}`,
-          {
-            status: response.statusCode,
-            cid: requestContext.cid,
-          },
+          `Response [${requestContext.cid}] - [${response.statusCode}]: ${formatMilliseconds(new Date().getTime() - requestContext.requestTimestamp)} ${JSON.stringify(
+            {
+              status: response.statusCode,
+              cid: requestContext.cid,
+            },
+          )}`,
         ),
       ),
       catchError((err) => {
-        this.logger.error(
-          `$Exception  [${requestContext.cid}] - [${response.statusCode}]: ${formatMilliseconds(new Date().getTime() - requestContext.requestTimestamp)}`,
-          {
-            status: err.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
-            cid: requestContext.cid,
-            stackTraces: err.stack,
-          },
-        );
+        if (!(err instanceof BusinessException))
+          this.logger.error(
+            `Exception  [${requestContext.cid}] - [${response.statusCode}]: ${formatMilliseconds(new Date().getTime() - requestContext.requestTimestamp)} ${JSON.stringify(
+              {
+                status: err.status ?? HttpStatus.INTERNAL_SERVER_ERROR,
+                cid: requestContext.cid,
+                stackTraces: err.stack,
+              },
+            )}`,
+          );
         return throwError(() => err);
       }),
     );

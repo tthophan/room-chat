@@ -1,4 +1,11 @@
-import { Controller, Inject, Param, ParseIntPipe, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { BaseController } from '~/core/bases';
@@ -17,6 +24,11 @@ export class RoomController extends BaseController {
     private readonly roomService: RoomService,
   ) {
     super();
+  }
+
+  @Get()
+  async getRooms() {
+    return await this.roomService.findAll();
   }
 
   @Post(':id/join')

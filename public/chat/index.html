@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Chat Room</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-semibold mb-4">Socket.IO Chat Room</h1>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+                <ul class="py-2 font-medium" id="room-list" role="none">
+                </ul>
+            </div>
+            <div>
+                <div id="messages" class="mb-4"></div>
+                <form id="messageForm">
+                    <input type="text" id="messageInput" class="border border-gray-300 px-4 py-2 rounded-lg w-full"
+                        placeholder="Type your message...">
+                    <button type="submit"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg ml-2">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = sessionStorage.getItem("authorization")
+            const userId = Number(sessionStorage.getItem("userId"))
+            const roomDefault = 1;     // TODO Hard code to fetch data of rooms
+            if (!token)
+                return window.location.href = '/signin'
+
+            fetchRooms()
+
+            fetchMessage(roomDefault)
+
+            const socket = io('/', {
+                extraHeaders: {
+                    Authorization: "Bearer " + token
+                }
+            });
+
+            socket.emit('join', { message: '', token: token });
+            // Display received messages
+            socket.on('message', function (message) {
+                displayMessage(message);
+            });
+
+
+            // Handle form submission
+            document.getElementById('messageForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const messageInput = document.getElementById('messageInput');
+                const message = messageInput.value.trim();
+                if (message !== '') {
+                    socket.emit('message', message);
+                    messageInput.value = '';
+                }
+            });
+            const roomList = document.getElementById('room-list');
+
+            function fetchMessage(roomId) {
+                fetch(`/v1.0/rooms/${roomId}/messages`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(async (response) => {
+                    const result = await response.json()
+
+                    if (response.status === 200) {
+                        const { data } = result
+                        data.forEach(message => {
+                            displayMessage({ ...message, messageId: message.id })
+                        });
+                    } else {
+                        if (response.status === 401) {
+                            sessionStorage.clear()
+                            window.location.href = '/signin'
+                        }
+                        Toastify({
+                            text: err,
+                            className: "error",
+                        }).showToast();
+                    }
+                })
+            }
+
+            function fetchRooms() {
+                const rooms = fetch('/v1.0/rooms', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    }
+                }).then(async (response) => {
+                    const result = await response.json()
+
+                    if (response.status === 200) {
+                        const { data: rooms } = result
+                        displayRoom(rooms)
+                    } else {
+                        if (response.status === 401) {
+                            sessionStorage.clear()
+                            window.location.href = '/signin'
+                        }
+                        Toastify({
+                            text: err,
+                            className: "error",
+                        }).showToast();
+                    }
+                })
+            }
+            // Clear existing content
+            function displayRoom(rooms) {
+                roomList.innerHTML = '';
+
+                rooms.forEach((room) => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+
+                    a.id = room.id;
+                    a.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-white';
+                    a.setAttribute('role', 'menuitem');
+                    a.innerHTML = `<div class="inline-flex items-center">${room.name}</div>`;
+                    // handle switch room
+                    a.addEventListener('click', () => {
+                        // TODO handle dynamic room
+                        socket.emit('join', { roomId: room.id, token: token });
+                    });
+
+                    li.appendChild(a);
+                    roomList.appendChild(li);
+                })
+            };
+            // Display message in HTML
+            function displayMessage(message) {
+                const messageDiv = document.createElement('div');
+                const content = document.createElement('p')
+                const btnDelete = document.createElement('button')
+                btnDelete.textContent = 'X'
+                content.textContent = `${message.sender}: ${message.message}`
+                btnDelete.addEventListener('click', function () {
+                    fetch(`/v1.0/rooms/1/messages/${message.messageId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                    }).then(async (response) => {
+                        const result = await response.json();
+                        if (response.status === 200) {
+                            Toastify({
+                                text: err,
+                                className: "error",
+                            }).showToast();
+                        } else {
+                            if (response.status === 401) {
+                                sessionStorage.clear()
+                                window.location.href = '/signin'
+                            }
+                            const { err } = result
+                            Toastify({
+                                text: err,
+                                className: "error",
+                            }).showToast();
+                        }
+                    })
+                })
+                messageDiv.append(content)
+                if (message.senderId == userId)
+                    messageDiv.append(btnDelete)
+                document.getElementById('messages').appendChild(messageDiv);
+                // Auto-scroll to bottom
+                document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            }
+        });
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+
+</html>

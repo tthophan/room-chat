@@ -52,6 +52,7 @@ export class MessageService extends BaseService {
           return message.sender.firstName + ' ' + message.sender.lastName;
         })(),
         senderId: message.senderId,
+        id: message.id,
       };
     });
   }
@@ -74,7 +75,6 @@ export class MessageService extends BaseService {
         },
       }),
     ]);
-
     if (!user) return;
     if (!roomUser)
       throw new BusinessException({
@@ -83,7 +83,7 @@ export class MessageService extends BaseService {
         status: HttpStatus.NOT_FOUND,
       });
 
-    await Promise.all([
+    const [msg] = await Promise.all([
       this.prismaService.message.create({
         data: {
           message,
@@ -102,6 +102,7 @@ export class MessageService extends BaseService {
         })(),
       }),
     ]);
+    return msg;
   }
 
   async delete(payload: DeleteMessage) {

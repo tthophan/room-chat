@@ -29,6 +29,14 @@
 $ yarn install
 ```
 
+## Migration
+```bash
+# Apply migration
+$ yarn prisma migrate deploy
+# create migration 
+$ yarn prisma migrate dev --name="<your_migration_name>"
+```
+
 ## Environment
 
 | Name          | Description                     | Data type                                        |
@@ -59,9 +67,14 @@ $ yarn run start:prod
 ### Running on docker
 
 ```bash
-# Start your application by running:
+# Start your application by running: 
 $ docker compose up --build
 ```
+
+#### Docker expose 3 services listen on:
+1. http://localhost:8081
+2. http://localhost:8082
+3. http://localhost:8083
 
 ## Test
 

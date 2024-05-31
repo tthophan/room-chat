@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-semibold mb-4">Sign Up</h1>
+        <form id="signUpForm">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="signUpFirstName" class="block text-gray-700">First Name</label>
+                    <input type="text" id="signUpFirstName" name="signUpFirstName"
+                        class="border border-gray-300 px-4 py-2 rounded-lg w-full">
+                </div>
+                <div>
+                    <label for="signUpLastName" class="block text-gray-700">Last Name</label>
+                    <input type="text" id="signUpLastName" name="signUpLastName"
+                        class="border border-gray-300 px-4 py-2 rounded-lg w-full">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="signUpUsername" class="block text-gray-700">Username</label>
+                <input type="text" id="signUpUsername" name="signUpUsername"
+                    class="border border-gray-300 px-4 py-2 rounded-lg w-full">
+            </div>
+            <div class="mb-4">
+                <label for="signUpPassword" class="block text-gray-700">Password</label>
+                <input type="password" id="signUpPassword" name="signUpPassword"
+                    class="border border-gray-300 px-4 py-2 rounded-lg w-full">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Sign Up</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const signUpForm = document.getElementById('signUpForm');
+
+            signUpForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const signUpFirstName = document.getElementById('signUpFirstName').value.trim();
+                const signUpLastName = document.getElementById('signUpLastName').value.trim();
+                const signUpUsername = document.getElementById('signUpUsername').value.trim();
+                const signUpPassword = document.getElementById('signUpPassword').value.trim();
+                fetch('/v1.0/auth/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: signUpUsername,
+                        password: signUpPassword,
+                        firstName: signUpFirstName,
+                        lastName: signUpLastName,
+                    })
+                }).then(async (response) => {
+                    const result = await response.json();
+                    if (response.status === 200) {
+                        const { data } = result
+                        sessionStorage.setItem("authorization", data.token)
+                        sessionStorage.setItem("userId", data.userId)
+                        window.location.href = '/';
+                    } else {
+                        const { err } = result
+                        Toastify({
+                            text: err,
+                            className: "error",
+                        }).showToast();
+                    }
+                })
+            });
+        });
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+
+</html>

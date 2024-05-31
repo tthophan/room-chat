@@ -98,15 +98,17 @@ export class ChatGateway
     @MessageBody() message: string,
   ) {
     const user = await this.getCurrentUser(client);
-    this.server.to(this.defaultRoom.toString()).emit(CHANNEL.MESSAGE, {
-      message,
-      sender: user.fullName,
-    });
-
-    await this.messageService.create({
+    const msg = await this.messageService.create({
       roomId: this.defaultRoom,
       senderId: user.id,
       message,
+    });
+
+    this.server.to(this.defaultRoom.toString()).emit(CHANNEL.MESSAGE, {
+      message,
+      sender: user.fullName,
+      senderId: user.id,
+      messageId: msg.id,
     });
 
     this.server.to(this.defaultRoom.toString()).emit(CHANNEL.NOTICE, {

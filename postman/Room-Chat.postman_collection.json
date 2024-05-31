@@ -1,0 +1,323 @@
+{
+	"info": {
+		"_postman_id": "cc843a1d-2546-46c3-aabb-35a3817ce2fb",
+		"name": "Room-Chat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33976334",
+		"_collection_link": "https://team11-0086.postman.co/workspace/TEAM-Workspace~35616c22-2e25-46bf-8a2d-90ccb45b1841/collection/33976334-cc843a1d-2546-46c3-aabb-35a3817ce2fb?action=share&source=collection_link&creator=33976334"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tthophan\",\n    \"password\": \"tthophan\",\n    \"firstName\": \"tthophan\",\n    \"lastName\": \"tthophan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{version}}/auth/signup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const statusCode = pm.response.code",
+									"if (statusCode === 200) {",
+									"    const jsonData = pm.response.json()",
+									"    pm.environment.set(\"jwtToken\", jsonData.data.token);",
+									"}",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"tthophan\",\n    \"password\": \"tthophan\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{version}}/auth/signin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{version}}",
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Room",
+			"item": [
+				{
+					"name": "join to room",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:3033/{{version}}/rooms/:id/join",
+							"host": [
+								"localhost"
+							],
+							"port": "3033",
+							"path": [
+								"{{version}}",
+								"rooms",
+								":id",
+								"join"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{roomId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "send message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"message\": \"{{$randomLoremSentence}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/{{version}}/rooms/:roomId/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{version}}",
+								"rooms",
+								":roomId",
+								"messages"
+							],
+							"variable": [
+								{
+									"key": "roomId",
+									"value": "{{roomId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{version}}/rooms/:roomId/messages/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{version}}",
+								"rooms",
+								":roomId",
+								"messages",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "roomId",
+									"value": "{{roomId}}"
+								},
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get messages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{version}}/rooms/:roomId/messages?cursor=5&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{version}}",
+								"rooms",
+								":roomId",
+								"messages"
+							],
+							"query": [
+								{
+									"key": "cursor",
+									"value": "5"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							],
+							"variable": [
+								{
+									"key": "roomId",
+									"value": "{{roomId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listen new message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/{{version}}/rooms/:roomId/messages/listen",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"{{version}}",
+								"rooms",
+								":roomId",
+								"messages",
+								"listen"
+							],
+							"variable": [
+								{
+									"key": "roomId",
+									"value": "{{roomId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/healthcheck",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"healthcheck"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

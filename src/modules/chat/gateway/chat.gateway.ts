@@ -195,4 +195,25 @@ export class ChatGateway
   async notice() {
     // TOOD we can add handler for each notice event
   }
+
+  @UseGuards(WebSocketGuard)
+  @SubscribeMessage(CHANNEL.DELETE_MESSAGE)
+  async deleteMessage(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() messageId: string,
+  ) {
+    const id = Number(messageId);
+    if (!id || Number.isNaN(id)) return;
+    const user = await this.getCurrentUser(client);
+    await this.messageService.delete({
+      id,
+      senderId: user.id,
+      roomId: this.defaultRoom,
+    });
+
+    this.server.to(this.defaultRoom.toString()).emit(CHANNEL.DELETE_MESSAGE, {
+      senderId: user.id,
+      messageId: id,
+    });
+  }
 }

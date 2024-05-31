@@ -5,4 +5,5 @@ export const CHANNEL = {
   SIGN_UP: 'signup',
   SIGN_IN: 'signin',
   NOTICE: 'notice',
+  DELETE_MESSAGE: 'delete-message',
 };

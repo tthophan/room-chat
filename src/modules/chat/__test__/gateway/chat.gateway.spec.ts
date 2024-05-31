@@ -332,4 +332,47 @@ describe('ChatGateway', () => {
       expect(authService.SignIn).toHaveBeenCalledTimes(0);
     });
   });
+  describe('delemessage', () => {
+    it('delete message success', async () => {
+      const getCurrentUser = jest.fn().mockReturnValue({
+        id: 1,
+      });
+      const server = {
+        to: jest.fn().mockReturnValue({
+          emit: jest.fn(),
+        }),
+      };
+      Reflect.set(chatGateway, 'getCurrentUser', getCurrentUser);
+      Reflect.set(chatGateway, 'server', server);
+      socketClient.request.context = {
+        userId: 1,
+      } as any;
+      jest.spyOn(messageService, 'delete').mockResolvedValue();
+      await chatGateway.deleteMessage(socketClient, '12');
+      expect(messageService.delete).toHaveBeenCalledTimes(1);
+      expect(messageService.delete).toHaveBeenCalledWith({
+        id: 12,
+        senderId: 1,
+        roomId: 1,
+      });
+    });
+    it('delete message fail', async () => {
+      const getCurrentUser = jest.fn().mockReturnValue({
+        id: 1,
+      });
+      const server = {
+        to: jest.fn().mockReturnValue({
+          emit: jest.fn(),
+        }),
+      };
+      Reflect.set(chatGateway, 'getCurrentUser', getCurrentUser);
+      Reflect.set(chatGateway, 'server', server);
+      socketClient.request.context = {
+        userId: 1,
+      } as any;
+      jest.spyOn(messageService, 'delete').mockResolvedValue();
+      await chatGateway.deleteMessage(socketClient, 'ddd');
+      expect(messageService.delete).toHaveBeenCalledTimes(0);
+    });
+  });
 });

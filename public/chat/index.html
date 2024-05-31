@@ -32,6 +32,12 @@
 
     <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
     <script>
+        const EVENTS = {
+            CHAT: 'message',
+            DELTE_CHAT: 'delete-message',
+            JOIN: 'join',
+            NOTICE: 'notice'
+        }
         document.addEventListener('DOMContentLoaded', function () {
             const token = sessionStorage.getItem("authorization")
             const userId = Number(sessionStorage.getItem("userId"))
@@ -49,12 +55,20 @@
                 }
             });
 
-            socket.emit('join', { message: '', token: token });
+            socket.emit(EVENTS.JOIN, {});
             // Display received messages
-            socket.on('message', function (message) {
+            socket.on(EVENTS.CHAT, function (message) {
                 displayMessage(message);
             });
+            socket.on(EVENTS.DELTE_CHAT, (message) => {
+                removeMessageElement(message.messageId)
+            })
+            socket.on(EVENTS.JOIN, () => {
 
+            })
+            socket.on(EVENTS.NOTICE, () => {
+
+            })
 
             // Handle form submission
             document.getElementById('messageForm').addEventListener('submit', function (event) {
@@ -62,7 +76,7 @@
                 const messageInput = document.getElementById('messageInput');
                 const message = messageInput.value.trim();
                 if (message !== '') {
-                    socket.emit('message', message);
+                    socket.emit(EVENTS.CHAT, message);
                     messageInput.value = '';
                 }
             });
@@ -136,47 +150,36 @@
                     // handle switch room
                     a.addEventListener('click', () => {
                         // TODO handle dynamic room
-                        socket.emit('join', { roomId: room.id, token: token });
+                        socket.emit(EVENTS.JOIN, { roomId: room.id });
                     });
 
                     li.appendChild(a);
                     roomList.appendChild(li);
                 })
             };
+
+            function removeMessageElement(messageId) {
+                if (!messageId) return
+                const messageElement = document.getElementById(`message__${messageId}`)
+                if (messageElement) messageElement.remove()
+            }
+
+            function handleDeleteMessage(message) {
+                socket.emit(EVENTS.DELTE_CHAT, message.messageId);
+                Toastify({
+                    text: 'Delete success',
+                    className: "success",
+                }).showToast();
+            }
             // Display message in HTML
             function displayMessage(message) {
                 const messageDiv = document.createElement('div');
                 const content = document.createElement('p')
                 const btnDelete = document.createElement('button')
                 btnDelete.textContent = 'X'
+                messageDiv.setAttribute('id', `message__${message.messageId}`)
                 content.textContent = `${message.sender}: ${message.message}`
-                btnDelete.addEventListener('click', function () {
-                    fetch(`/v1.0/rooms/1/messages/${message.messageId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                    }).then(async (response) => {
-                        const result = await response.json();
-                        if (response.status === 200) {
-                            Toastify({
-                                text: err,
-                                className: "error",
-                            }).showToast();
-                        } else {
-                            if (response.status === 401) {
-                                sessionStorage.clear()
-                                window.location.href = '/signin'
-                            }
-                            const { err } = result
-                            Toastify({
-                                text: err,
-                                className: "error",
-                            }).showToast();
-                        }
-                    })
-                })
+                btnDelete.addEventListener('click', () => handleDeleteMessage(message))
                 messageDiv.append(content)
                 if (message.senderId == userId)
                     messageDiv.append(btnDelete)

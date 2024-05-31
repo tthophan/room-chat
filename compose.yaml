@@ -21,13 +21,17 @@ services:
       - /bin/sh
       - -c
       - |
-        cd /usr/src/migration 
-        yarn install
-        yarn prisma migrate deploy
+        cd /usr/src/migration
+        npx prisma migrate deploy
         cd /usr/src/app
         node dist/main.js > /dev/stdout
     volumes:
-      - ./:/usr/src/migration
+      - ./prisma:/usr/src/migration/prisma
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   server-02:
     build:
@@ -47,6 +51,11 @@ services:
       REDIS_URL: redis://redis:6379
     ports:
       - 8082:80
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   server-03:
     build:
@@ -66,6 +75,12 @@ services:
       REDIS_URL: redis://redis:6379
     ports:
       - 8083:80
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 
   db:
     image: mysql:latest
@@ -78,6 +93,12 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - 3361:3306
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=rootpw
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 55
 
   redis:
     image: redis:latest
@@ -90,6 +111,8 @@ services:
     environment:
       - REDIS_PORT=6379
       - REDIS_DATABASES=16
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
 
 volumes:
   db-data:

@@ -13,18 +13,40 @@
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-semibold mb-4">Socket.IO Chat Room</h1>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-                <ul class="py-2 font-medium" id="room-list" role="none">
+        <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg overflow-hidden flex">
+            <!-- Room List -->
+            <div class="w-1/4 bg-gray-200 p-4">
+                <h2 class="text-lg font-semibold mb-4">Room List</h2>
+                <ul id="room-list">
+                    <!-- Room List Items -->
+                    <!-- <li class="py-2 px-4 border-b border-gray-300 hover:bg-gray-100 cursor-pointer">Room 3</li> -->
                 </ul>
             </div>
-            <div>
-                <div id="messages" class="mb-4"></div>
+            <div class="flex-grow p-4">
+                <h2 class="text-lg font-semibold mb-4">Chat Content</h2>
+                <!-- Messages Container -->
+                <div class="overflow-y-auto max-h-screen border border-gray-300 rounded-lg p-4 bg-gray-100"
+                    id="messages">
+                    <!-- Individual Messages -->
+                    <!-- <div class="flex mb-2 items-start">
+                        <div class="rounded-full h-8 w-8 bg-gray-300 mr-2"></div>
+                        <div class="flex-grow bg-white p-2 rounded-lg relative">
+                            <p class="text-sm">Message 1</p>
+                            <button class="absolute top-0 right-0 text-red-500 hover:text-red-700 focus:outline-none">
+                          X
+                            </button>
+                        </div>
+                    </div> -->
+                </div>
+                <!-- Message Input -->
                 <form id="messageForm">
-                    <input type="text" id="messageInput" class="border border-gray-300 px-4 py-2 rounded-lg w-full"
-                        placeholder="Type your message...">
-                    <button type="submit"
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg ml-2">Send</button>
+                    <div class="mt-4 flex">
+                        <input id="messageInput" type="text"
+                            class="flex-grow border border-gray-300 rounded-l-lg p-2 outline-none"
+                            placeholder="Type your message...">
+                        <button
+                            class="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none">Send</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -174,15 +196,26 @@
             // Display message in HTML
             function displayMessage(message) {
                 const messageDiv = document.createElement('div');
+                const divRoundedFull = document.createElement('div')
+                const divContent = document.createElement('div')
                 const content = document.createElement('p')
                 const btnDelete = document.createElement('button')
                 btnDelete.textContent = 'X'
-                messageDiv.setAttribute('id', `message__${message.messageId}`)
                 content.textContent = `${message.sender}: ${message.message}`
                 btnDelete.addEventListener('click', () => handleDeleteMessage(message))
-                messageDiv.append(content)
+
+                btnDelete.setAttribute('class', "absolute top-2 right-2 text-red-500 hover:text-red-700 focus:outline-none");
+                messageDiv.setAttribute('id', `message__${message.messageId}`)
+                messageDiv.setAttribute("class", `flex mb-2 items-start`)
+                divRoundedFull.setAttribute('class', `rounded-full h-8 w-8 bg-gray-300 mr-2  ${message.senderId == userId && 'bg-green-500'}`)
+                divContent.setAttribute('class', 'flex-grow bg-white p-2 rounded-lg relative')
+                content.setAttribute('class', 'text-sm')
                 if (message.senderId == userId)
-                    messageDiv.append(btnDelete)
+                    divContent.append(btnDelete)
+
+                divContent.append(content)
+                messageDiv.append(divRoundedFull)
+                messageDiv.append(divContent)
                 document.getElementById('messages').appendChild(messageDiv);
                 // Auto-scroll to bottom
                 document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;

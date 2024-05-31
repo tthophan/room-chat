@@ -17,6 +17,17 @@ services:
       REDIS_URL: redis://redis:6379
     ports:
       - 8081:80
+    command:  
+      - /bin/sh
+      - -c
+      - |
+        cd /usr/src/migration 
+        yarn install
+        yarn prisma migrate deploy
+        cd /usr/src/app
+        node dist/main.js > /dev/stdout
+    volumes:
+      - ./:/usr/src/migration
 
   server-02:
     build:
